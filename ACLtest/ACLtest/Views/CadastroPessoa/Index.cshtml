@@ -1,0 +1,428 @@
+﻿@model ACLtest.Models.CadastroViewModel
+
+<style>
+
+    .linha {
+        border-bottom: 1px solid black;
+        margin-bottom: 10px;
+    }
+.card {
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+margin: 20px;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+.card-title {
+    margin-bottom: 0;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    font-weight: bold;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-weight: bold;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    font-weight: bold;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.table th,
+.table td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.table td:last-child {
+    text-align: right;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+.modal-title {
+    margin-bottom: 0;
+}
+
+.modal-footer {
+    border-top: none;
+    justify-content: space-between;
+}
+
+
+</style>
+
+<br />
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title">Pesquisar Pessoa</h5>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-success btn-sm" onclick="limpar()"data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Adicionar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <b> @Html.LabelFor(m => m.Pesquisa.Nome, new { @class = "control-label" })</b>
+                    @Html.EditorFor(model => model.Pesquisa.Nome, new { htmlAttributes = new { @id = "nome",  @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+
+                    <label>&nbsp;</label><br /> <button id="btnPesquisar" onclick="pesquisarPessoa()" class="btn btn-primary" type="submit"><i class="fas fa-search"></i> &nbsp; Pesquisar </button>
+
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- ./card-body -->
+</div>
+<br>
+
+
+<table id="table_id" class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.List.FirstOrDefault().Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List.FirstOrDefault().CpfCnpj)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.List.FirstOrDefault().Email)
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.List)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CpfCnpj)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="editar(@item.Id)" data-toggle="tooltip" data-placement="top" title="Editar"><i class="far fa-edit"></i>Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="excluir(@item.Id)" data-toggle="tooltip" data-placement="top" title="Deletar"><i class="fas fa-times"></i>Excluir</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Cadastro Pessoa</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="block-message-modal">
+                            @Html.ValidationSummary(true)
+                            @Html.HiddenFor(m => m.Cadastro.Id, new { @id = "id" })
+
+                            <div class="message-holder">
+                                <h5 class="subtitle">Pessoa Física</h5>
+                                <div class="row linha"></div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Nome, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Nome, new { htmlAttributes = new {@id = "nomeCadastro", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.CpfCnpj, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.CpfCnpj, new { htmlAttributes = new { id = "cpf",@class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Profissao, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Profissao, new { htmlAttributes = new { id = "profissao",@class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Email, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Email, new { htmlAttributes = new {id = "email", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                </div >
+                                <br />
+                           
+                       
+                                <h5 class="subtitle">Endereço</h5>
+                                <div class="row linha"></div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Cep, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Cep, new { htmlAttributes = new {id = "cep", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Rua, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Rua, new { htmlAttributes = new {id = "rua", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Bairro, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Bairro, new { htmlAttributes = new {id = "bairro", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Cidade, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Cidade, new { htmlAttributes = new { id = "cidade",@class = "form-control" } })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Estado, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Estado, new { htmlAttributes = new { id = "estado",@class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Numero, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Numero, new { htmlAttributes = new {id = "numero", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Complemento, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Complemento, new { htmlAttributes = new {id = "complemento", @class = "form-control" } })
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br />
+                                <h5 class="subtitle">Pessoa Jurídica</h5>
+                                <div class="row linha"></div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Atividade, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Atividade, new { htmlAttributes = new {id = "atividade", @class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Situacao, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Situacao, new { htmlAttributes = new { id = "situacao",@class = "form-control" } })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <b>@Html.LabelFor(m => m.Cadastro.Site, new { @class = "control-label" })</b>
+                                            @Html.EditorFor(model => model.Cadastro.Site, new { htmlAttributes = new { id = "site",@class = "form-control" } })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- ./card-body -->
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-success" onclick="post()" id="btnSalvar" data-attr="enter" data-loading-text="Aguarde ... ">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+    function editar(id) {
+        $.ajax({
+            url: "/CadastroPessoa/Edit?id=" + id,
+            success: function (data) {
+
+                document.getElementById('id').value = data.id;
+                document.getElementById('nomeCadastro').value = data.nome;
+                document.getElementById('cpf').value = data.cpfCnpj;
+                document.getElementById('profissao').value = data.profissao;
+                document.getElementById('email').value = data.email;
+                document.getElementById('rua').value = data.rua;
+                document.getElementById('numero').value = data.numero;
+                document.getElementById('bairro').value = data.bairro;
+                document.getElementById('cidade').value = data.cidade;
+                document.getElementById('estado').value = data.estado;
+                document.getElementById('cep').value = data.cep;
+                document.getElementById('atividade').value = data.atividade;
+                document.getElementById('situacao').value = data.situacao;
+                document.getElementById('site').value = data.site;
+                document.getElementById('complemento').value = data.complemento;
+
+                var myModal = document.getElementById('exampleModal');
+                var modal = new bootstrap.Modal(myModal);
+                modal.show();
+            }
+        });
+    };
+
+    function pesquisarPessoa() {
+
+        var cpfCnpjNome = $('#nome').val();
+        window.location.href = '/CadastroPessoa/Pesquisar?cpfCnpjNome=' + cpfCnpjNome;
+    };
+
+    function post() {
+
+        var model = getFields();
+        $.ajax({
+            type: "POST",
+            url: "/CadastroPessoa/Post",
+            data: model,
+            success: function (data) {
+                window.location.href = '/CadastroPessoa/Pesquisar';
+            },
+            error: function (exr, sender) {
+                alert('Falha ao salvar Cadastro Pessoa');
+            }
+        });
+    };
+
+    function getFields() {
+        debugger;
+
+        var model = {
+            id: $('#id').val(),
+            nome: $('#nomeCadastro').val(),
+            cpfcnpj: $('#cpf').val(),
+            profissao: $('#profissao').val(),
+            email: $('#email').val(),
+            rua: $('#rua').val(),
+            numero: $('#numero').val(),
+            bairro: $('#bairro').val(),
+            cidade: $('#cidade').val(),
+            estado: $('#estado').val(),
+            cep: $('#cep').val(),
+            atividade: $('#atividade').val(),
+            situacao: $('#situacao').val(),
+            site: $('#site').val(),
+            complemento: $('#complemento').val()
+        }
+        return model;
+    }
+
+    function limpar()
+    {
+        document.getElementById('id').value = '';
+        document.getElementById('nomeCadastro').value = '';
+        document.getElementById('cpf').value = '';
+        document.getElementById('profissao').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('rua').value = '';
+        document.getElementById('numero').value = '';
+        document.getElementById('bairro').value = '';
+        document.getElementById('cidade').value = '';
+        document.getElementById('estado').value = '';
+        document.getElementById('cep').value = '';
+        document.getElementById('atividade').value = '';
+        document.getElementById('situacao').value = '';
+        document.getElementById('site').value = '';
+        document.getElementById('complemento').value = '';
+    }
+
+    function excluir(id) {
+        window.location.href = '/CadastroPessoa/Delete?id=' + id;
+    }
+</script>
